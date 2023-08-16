@@ -3,7 +3,7 @@ import { Body } from '@nestjs/common/decorators';
 import { SignUpDto } from '../dtos/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-
+import * as jwt from 'jsonwebtoken';
 import { UserType } from '@prisma/client';
 
 interface SignUpParams {
@@ -22,9 +22,12 @@ export class AuthService {
         email,
       },
     });
+    //Check if user exists
     if (userExists) {
       throw new ConflictException();
     }
+
+    // Hash password inputed
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.prismaService.user.create({
       data: {
@@ -35,6 +38,13 @@ export class AuthService {
         user_type: UserType.BUYER,
       },
     });
-    return user;
+
+    // Generate token
+    const token = await jwt.sign(
+      { name, id: user.id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: 360000 },
+    );
+    return token;
   }
 }
