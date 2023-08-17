@@ -26,7 +26,10 @@ interface SignInParams {
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
-  async signUp({ email, password, name, phone }: SignUpParams) {
+  async signUp(
+    { email, password, name, phone }: SignUpParams,
+    userType: UserType,
+  ) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
         email,
@@ -45,7 +48,7 @@ export class AuthService {
         name,
         phone,
         password: hashedPassword,
-        user_type: UserType.BUYER,
+        user_type: userType,
       },
     });
 
@@ -79,5 +82,10 @@ export class AuthService {
     return jwt.sign({ name, id }, process.env.JWT_SECRET_KEY, {
       expiresIn: 360000,
     });
+  }
+
+  generateProductKey(email: string, userType: UserType) {
+    const string = `${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`;
+    return bcrypt.hash(string, 10);
   }
 }
