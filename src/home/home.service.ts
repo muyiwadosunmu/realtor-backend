@@ -178,4 +178,18 @@ export class HomeService {
 
     return new HomeResponseDto(updatedHome);
   }
+
+  async deleteHomeById(homeId: number) {
+    //If using sequel we could just use a cascade function
+    await this.prismaService.image.deleteMany({
+      where: {
+        home_id: homeId,
+      },
+    });
+    await this.prismaService.home.delete({
+      where: {
+        id: homeId,
+      },
+    });
+  }
 }

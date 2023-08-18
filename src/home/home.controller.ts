@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -51,6 +53,7 @@ export class HomeController {
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.CREATED)
   updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
@@ -59,7 +62,8 @@ export class HomeController {
   }
 
   @Delete(':id')
-  deleteHome() {
-    return;
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteHome(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.deleteHomeById(id);
   }
 }
