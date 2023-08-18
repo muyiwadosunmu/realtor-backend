@@ -14,6 +14,7 @@ import {
 import { HomeService } from './home.service';
 import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
+import { User, UserInfo } from 'src/decorators/user.decorator';
 
 @Controller('homes')
 export class HomeController {
@@ -42,9 +43,10 @@ export class HomeController {
     return this.homeService.getHomes(filters);
   }
   @Post()
-  createHome(@Body() createHomeDto: CreateHomeDto) {
+  createHome(@Body() createHomeDto: CreateHomeDto, @User() user: UserInfo) {
+    console.log(user);
     console.log({ createHomeDto });
-    return this.homeService.createHome(createHomeDto);
+    return this.homeService.createHome(createHomeDto, user.id);
   }
 
   @Get(':id')
