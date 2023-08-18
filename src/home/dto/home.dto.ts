@@ -109,3 +109,46 @@ export class CreateHomeDto {
   @Type(() => Image)
   images: Image[];
 }
+
+export class UpdateHomeDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  address?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  numberofBedrooms?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  numberofBathrooms?: number;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  city?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  landSize?: number;
+
+  @IsOptional()
+  @IsEnum(PropertyType)
+  propertyType?: PropertyType;
+
+  //   @IsOptional()
+  //   @IsArray()
+  //   @ValidateNested({ each: true })
+  //   @Type(() => Image)
+  //   images: Image[];
+  // _______________THis was moved to another endpoint on purpose
+}
