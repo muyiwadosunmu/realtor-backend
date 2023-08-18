@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
 import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
@@ -20,7 +21,7 @@ import { User, UserInfo } from 'src/decorators/user.decorator';
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}
   @Get()
-  getHomes(
+  async getHomes(
     @Query('city') city?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -43,7 +44,10 @@ export class HomeController {
     return this.homeService.getHomes(filters);
   }
   @Post()
-  createHome(@Body() createHomeDto: CreateHomeDto, @User() user: UserInfo) {
+  async createHome(
+    @Body() createHomeDto: CreateHomeDto,
+    @User() user: UserInfo,
+  ) {
     console.log(user);
     console.log({ createHomeDto });
     return this.homeService.createHome(createHomeDto, user.id);
@@ -56,16 +60,34 @@ export class HomeController {
 
   @Put(':id')
   @HttpCode(HttpStatus.CREATED)
-  updateHome(
+  async updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
+    @User() user: UserInfo,
   ) {
+    // Got realtor from the home id passed
+    const realtor = await this.homeService.getRealtorByHomeId(id);
+    if (realtor.id !== user.id) {
+      throw new UnauthorizedException();
+    }
+
+    //Home is able to be updated by the realtor him/herself
     return this.homeService.updateHomeById(id, body);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteHome(@Param('id', ParseIntPipe) id: number) {
+  async deleteHome(
+    @Param('id', ParseIntPipe) id: number,
+    @User() user: UserInfo,
+  ) {
+    // Got realtor from the home id passed
+    const realtor = await this.homeService.getRealtorByHomeId(id);
+    if (realtor.id !== user.id) {
+      throw new UnauthorizedException();
+    }
+
+    // realtor alone is able to delete
     return this.homeService.deleteHomeById(id);
   }
 }

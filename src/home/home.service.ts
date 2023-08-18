@@ -195,4 +195,28 @@ export class HomeService {
       },
     });
   }
+
+  async getRealtorByHomeId(homeId: number) {
+    const home = this.prismaService.home.findUnique({
+      where: {
+        id: homeId,
+      },
+      select: {
+        realtor: {
+          select: {
+            email: true,
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    if (!home) {
+      throw new NotFoundException();
+    }
+
+    return (await home).realtor;
+  }
 }
