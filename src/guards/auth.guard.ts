@@ -2,10 +2,20 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+interface JWTPayload {
+  name: string;
+  id: number;
+  exp: number;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   ///////////////////
   async canActivate(context: ExecutionContext) {
@@ -21,15 +31,27 @@ export class AuthGuard implements CanActivate {
       const request = context.switchToHttp().getRequest<Request>();
       const token = request.headers?.authorization?.split(' ')[1];
       try {
-        const user = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const payload = (await jwt.verify(
+          token,
+          process.env.JWT_SECRET_KEY,
+        )) as JWTPayload;
+        /**3. Database request to get user by their ID */
+        const user = await this.prismaService.user.findUnique({
+          where: {
+            id: payload.id,
+          },
+        });
+        if (!user) return false;
         console.log({ user });
+        // Check for user role
+        if (roles.includes(user.user_type)) {
+          return true;
+        }
+        return false;
       } catch (error) {
         return false;
       }
     }
-    return true;
-
-    /**3. Database request to get user by their ID */
     /**4. Determine if the user has permissions */
     return true;
   }
