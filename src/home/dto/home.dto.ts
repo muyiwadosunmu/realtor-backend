@@ -152,3 +152,9 @@ export class UpdateHomeDto {
   //   images: Image[];
   // _______________THis was moved to another endpoint on purpose
 }
+
+export class InquireDto {
+  @IsString()
+  @IsNotEmpty()
+  message: string;
+}

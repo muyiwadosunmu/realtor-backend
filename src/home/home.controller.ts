@@ -14,7 +14,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
+import {
+  CreateHomeDto,
+  HomeResponseDto,
+  InquireDto,
+  UpdateHomeDto,
+} from './dto/home.dto';
 import { PropertyType, UserType } from '@prisma/client';
 import { User, UserInfo } from 'src/decorators/user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -98,4 +103,32 @@ export class HomeController {
     // realtor alone is able to delete
     return this.homeService.deleteHomeById(id);
   }
+
+  @Roles(UserType.BUYER)
+  @Post(':id/inquire')
+  async inquire(
+    @Param('id', ParseIntPipe) homeId: number,
+    @User() user: UserInfo,
+    @Body() { message }: InquireDto,
+  ) {
+    return this.homeService.inquire(user, homeId, message);
+  }
+
+  @Roles(UserType.REALTOR)
+  @Get(':id/messages')
+  async getHomeMessages(
+    @Param('id', ParseIntPipe) homeid: number,
+    @User() user: UserInfo,
+  ) {
+    const realtor = await this.homeService.getRealtorByHomeId(homeid);
+    if (realtor.id !== user.id) {
+      throw new UnauthorizedException();
+    }
+    return this.homeService.getMessagesByHome(homeid);
+  }
 }
+
+/**
+ * 1. Buyer sends message to Realtot
+ * 2. REaltor gets all messages
+ */
