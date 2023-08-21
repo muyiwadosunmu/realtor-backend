@@ -80,7 +80,7 @@ export class AuthService {
   }
   private generateToken(name: string, id: number) {
     return jwt.sign({ name, id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: 360000,
+      expiresIn: 36000000, //600minutes
     });
   }
 

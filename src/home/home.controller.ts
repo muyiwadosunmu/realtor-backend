@@ -49,15 +49,15 @@ export class HomeController {
 
   /** @Roles(UserType.REALTOR, UserType.ADMIN) */
 
-  @Roles(UserType.REALTOR, UserType.ADMIN)
+  @Roles(UserType.REALTOR)
   @UseGuards(AuthGuard)
   @Post()
   async createHome(
     @Body() createHomeDto: CreateHomeDto,
     @User() user: UserInfo,
   ) {
-    return 'Created Home';
     return this.homeService.createHome(createHomeDto, user.id);
+    // return 'Created Home';
   }
 
   @Get(':id')
@@ -65,6 +65,8 @@ export class HomeController {
     return this.homeService.getHome(id);
   }
 
+  @Roles(UserType.REALTOR)
+  @UseGuards(AuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.CREATED)
   async updateHome(
@@ -82,6 +84,8 @@ export class HomeController {
     return this.homeService.updateHomeById(id, body);
   }
 
+  @Roles(UserType.REALTOR)
+  @UseGuards(AuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteHome(
