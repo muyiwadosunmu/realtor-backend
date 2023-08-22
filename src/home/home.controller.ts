@@ -24,7 +24,9 @@ import { PropertyType, UserType } from '@prisma/client';
 import { User, UserInfo } from 'src/decorators/user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorators/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('homes')
 @Controller('homes')
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}

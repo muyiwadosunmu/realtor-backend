@@ -16,6 +16,7 @@ import {
   isPositive,
 } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class HomeResponseDto {
   id: number;
@@ -77,33 +78,43 @@ class Image {
 }
 
 export class CreateHomeDto {
+  @ApiProperty({ description: 'Address of the property' })
   @IsString()
   @IsNotEmpty()
   address: string;
 
+  @ApiProperty({ description: 'Number of bedrooms the property has' })
   @IsNumber()
   @IsPositive()
   numberofBedrooms: number;
 
+  @ApiProperty({ description: 'Number of bathrooms the property has' })
   @IsNumber()
   @IsPositive()
   numberofBathrooms: number;
 
+  @ApiProperty({ description: 'Which city is the property located' })
   @IsString()
   @IsNotEmpty()
   city: string;
 
+  @ApiProperty({ description: 'Asking price of the property' })
   @IsNumber()
   @IsPositive()
   price: number;
 
+  @ApiProperty({ description: 'The land size of the prperty in sq.metres' })
   @IsNumber()
   @IsPositive()
   landSize: number;
 
+  @ApiProperty({
+    description: 'Property type, for now we support a CONVO OR RESIDENTIAL',
+  })
   @IsEnum(PropertyType)
   propertyType: PropertyType;
 
+  @ApiProperty({ description: 'Provide at least 3 images of the property' })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Image)

@@ -13,7 +13,9 @@ import { GenerateProductKeyDto, SignInDto, SignUpDto } from '../dtos/auth.dto';
 import { UserType } from '@prisma/client';
 import { userInfo } from 'os';
 import { User, UserInfo } from 'src/decorators/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
